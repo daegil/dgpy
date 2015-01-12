@@ -9,6 +9,8 @@ import filecmp
 target_dir_a = '/Users/darren/pkg'
 target_dir_b = '/Users/darren/pkg_test'
 
+skip_words = ['.svn', 'bbb', 'aaa', 'ccc']
+
 except_file_ext = ['log']
 
 if __name__ == '__main__':
@@ -20,19 +22,34 @@ if __name__ == '__main__':
         target_dir_b = target_dir_b[0:len(target_dir_b)-1]
     for (dirpath, dirnames, filenames) in os.walk(target_dir_a):
         #print (dirpath, dirnames, filenames)
+        skip_flag = False
+        for ele in skip_words:
+            if dirpath.find(ele) != -1:
+                skip_flag = True
+        if skip_flag: continue
         if len(filenames) > 0:
+            skip_flag = False
             for fn in filenames:
+                for ele in skip_words:
+                    if fn.find(ele) != -1:
+                        skip_flag = True
+                if skip_flag: continue
                 target_dir_a_list[dirpath.split(target_dir_a)[1]+'/'+fn] = 'file'
         elif len(dirnames) == 0 and len(filenames) == 0:
-            print (dirpath, dirnames, filenames)
+            #print (dirpath, dirnames, filenames)
             target_dir_a_list[dirpath.split(target_dir_a)[1]+'/'] = 'directory'
     for (dirpath, dirnames, filenames) in os.walk(target_dir_b):
         #print (dirpath, dirnames, filenames)
         if len(filenames) > 0:
             for fn in filenames:
+                skip_flag = False
+                for ele in skip_words:
+                    if fn.find(ele) != -1:
+                        skip_flag = True
+                if skip_flag: continue
                 target_dir_b_list[dirpath.split(target_dir_b)[1]+'/'+fn] = 'file'
         elif len(dirnames) == 0 and len(filenames) == 0:
-            print (dirpath, dirnames, filenames)
+            #print (dirpath, dirnames, filenames)
             target_dir_b_list[dirpath.split(target_dir_b)[1]+'/'] = 'directory'
     #print len(target_dir_a_list)
     #print len(target_dir_b_list)
