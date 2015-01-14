@@ -10,7 +10,7 @@ import filecmp
 target_dir_a = '/Users/darren/pkg'
 target_dir_b = '/Users/darren/pkg_test'
 
-target_a_crcf_ignore = True
+crcf_ignore = True
 skip_words = ['.svn', 'bbb', 'aaa', 'ccc']
 
 except_file_ext = ['log']
@@ -71,15 +71,24 @@ if __name__ == '__main__':
             continue
         if target_dir_a_list[k] == 'directory':
             continue
-        crlf_term_file = False
-        if target_dir_a:
+        target_a_crlf_term_file = False
+        target_b_crlf_term_file = False
+        if crcf_ignore:
             if os.popen('file '+target_dir_a+k).read().find('CRLF line terminators') != -1:
-                crlf_term_file = True
-                os.system('tr -d "\15\32" < %s > crlf.tmp' % (target_dir_a+k,))
-        if crlf_term_file:
-            rst = filecmp.cmp('crlf.tmp', target_dir_b+k)
+                target_a_crlf_term_file = True
+                os.system('tr -d "\15\32" < %s > crlf_target_a.tmp' % (target_dir_a+k,))
+            if os.popen('file '+target_dir_b+k).read().find('CRLF line terminators') != -1:
+                target_b_crlf_term_file = True
+                os.system('tr -d "\15\32" < %s > crlf_target_b.tmp' % (target_dir_b+k,))
+        if target_a_crlf_term_file:
+            target_a_fn = 'crlf_target_a.tmp'
         else:
-            rst = filecmp.cmp(target_dir_a+k, target_dir_b+k)
+            target_a_fn = target_dir_a+k
+        if target_b_crlf_term_file:
+            target_b_fn = 'crlf_target_b.tmp'
+        else:
+            target_b_fn = target_dir_b+k
+        rst = filecmp.cmp(target_a_fn, target_b_fn)
         if rst:
             result[target_dir_a+k] = ['==']
         else:
