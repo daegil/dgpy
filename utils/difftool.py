@@ -6,9 +6,11 @@ __author__ = 'darren'
 import os
 import filecmp
 
+
 target_dir_a = '/Users/darren/pkg'
 target_dir_b = '/Users/darren/pkg_test'
 
+target_a_crcf_ignore = True
 skip_words = ['.svn', 'bbb', 'aaa', 'ccc']
 
 except_file_ext = ['log']
@@ -69,7 +71,16 @@ if __name__ == '__main__':
             continue
         if target_dir_a_list[k] == 'directory':
             continue
-        if filecmp.cmp(target_dir_a+k, target_dir_b+k):
+        crlf_term_file = False
+        if target_dir_a:
+            if os.popen('file '+target_dir_a+k).read().find('CRLF line terminators') != -1:
+                crlf_term_file = True
+                os.system('tr -d "\15\32" < %s > crlf.tmp' % (target_dir_a+k,))
+        if crlf_term_file:
+            rst = filecmp.cmp('crlf.tmp', target_dir_b+k)
+        else:
+            rst = filecmp.cmp(target_dir_a+k, target_dir_b+k)
+        if rst:
             result[target_dir_a+k] = ['==']
         else:
             result[target_dir_a+k] = ['!=', 'vimdiff {0}{1} {2}{3}'.format(target_dir_a, k, target_dir_b, k)]
