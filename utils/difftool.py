@@ -9,11 +9,13 @@ import filecmp
 
 target_dir_a = '/Users/darren/pkg'
 target_dir_b = '/Users/darren/pkg_test'
+#target_dir_a = '/home/deploy/workspace/pj'
+#target_dir_b = '/home/deploy/pkg/pjproject-1.14.2'
 
-crcf_ignore = True
-skip_words = ['.svn', 'bbb', 'aaa', 'ccc']
+crcf_ignore = False
+skip_words = ['.svn', '.o', 'tests']
+#skip_words = ['.svn', '.o', 'tests', 'depend', '.a']
 
-except_file_ext = ['log']
 
 if __name__ == '__main__':
     target_dir_a_list = {}
@@ -35,16 +37,20 @@ if __name__ == '__main__':
                 for ele in skip_words:
                     if fn.find(ele) != -1:
                         skip_flag = True
-                if skip_flag: continue
-                target_dir_a_list[dirpath.split(target_dir_a)[1]+'/'+fn] = 'file'
+                if not skip_flag:
+                    target_dir_a_list[dirpath.split(target_dir_a)[1]+'/'+fn] = 'file'
         elif len(dirnames) == 0 and len(filenames) == 0:
             #print (dirpath, dirnames, filenames)
             target_dir_a_list[dirpath.split(target_dir_a)[1]+'/'] = 'directory'
     for (dirpath, dirnames, filenames) in os.walk(target_dir_b):
         #print (dirpath, dirnames, filenames)
+        skip_flag = False
+        for ele in skip_words:
+            if dirpath.find(ele) != -1:
+                skip_flag = True
+        if skip_flag: continue
         if len(filenames) > 0:
             for fn in filenames:
-                skip_flag = False
                 for ele in skip_words:
                     if fn.find(ele) != -1:
                         skip_flag = True
@@ -74,12 +80,10 @@ if __name__ == '__main__':
         target_a_crlf_term_file = False
         target_b_crlf_term_file = False
         if crcf_ignore:
-            if os.popen('file '+target_dir_a+k).read().find('CRLF line terminators') != -1:
-                target_a_crlf_term_file = True
-                os.system('tr -d "\15\32" < %s > crlf_target_a.tmp' % (target_dir_a+k,))
-            if os.popen('file '+target_dir_b+k).read().find('CRLF line terminators') != -1:
-                target_b_crlf_term_file = True
-                os.system('tr -d "\15\32" < %s > crlf_target_b.tmp' % (target_dir_b+k,))
+            target_a_crlf_term_file = True
+            os.system('tr -d "\15\32" < %s > crlf_target_a.tmp' % (target_dir_a+k,))
+            target_b_crlf_term_file = True
+            os.system('tr -d "\15\32" < %s > crlf_target_b.tmp' % (target_dir_b+k,))
         if target_a_crlf_term_file:
             target_a_fn = 'crlf_target_a.tmp'
         else:
@@ -110,7 +114,9 @@ if __name__ == '__main__':
     left_only_file_cnt = 0
     print '\n[DIFF RESULT]'
     print '{FILE} {RESULT SIGN}'
-    for k in result:
+    key_sorted = list(result)
+    key_sorted.sort()
+    for k in key_sorted:
         if result[k][0] == '!=':
             print k, result[k][0]
             vimdiff_str_list.append(result[k][1])
