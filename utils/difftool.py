@@ -1,5 +1,3 @@
-__author__ = 'darren'
-
 #! /bin/env python
 #-*- coding:utf-8 -*-
 
@@ -13,8 +11,7 @@ target_dir_b = '/Users/darren/pkg_test'
 #target_dir_b = '/home/deploy/pkg/pjproject-1.14.2'
 
 crcf_ignore = False
-skip_words = ['.svn', '.o', 'tests']
-#skip_words = ['.svn', '.o', 'tests', 'depend', '.a']
+skip_words = ['.svn', '.o', 'tests', 'depend', '.a']
 
 
 if __name__ == '__main__':
@@ -30,10 +27,11 @@ if __name__ == '__main__':
         for ele in skip_words:
             if dirpath.find(ele) != -1:
                 skip_flag = True
-        if skip_flag: continue
+        if skip_flag:
+            continue
         if len(filenames) > 0:
-            skip_flag = False
             for fn in filenames:
+                skip_flag = False
                 for ele in skip_words:
                     if fn.find(ele) != -1:
                         skip_flag = True
@@ -59,12 +57,6 @@ if __name__ == '__main__':
         elif len(dirnames) == 0 and len(filenames) == 0:
             #print (dirpath, dirnames, filenames)
             target_dir_b_list[dirpath.split(target_dir_b)[1]+'/'] = 'directory'
-    #print len(target_dir_a_list)
-    #print len(target_dir_b_list)
-    #print '[target_dir_a]'
-    #print target_dir_a_list
-    #print '[target_dir_b]'
-    #print target_dir_b_list
 
     result = {}
     print 'Compare [{0}] with [{1}]'.format(target_dir_a, target_dir_b)
