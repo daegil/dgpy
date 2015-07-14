@@ -24,10 +24,19 @@ def to_unicode_or_bust(obj, encoding='utf-8'):
             obj = unicode(obj, encoding)
     return obj
 
+def enum(*sequential, **named):
+    enums = dict(zip(sequential, range(len(sequential))), **named)
+    reverse = dict((value, key) for key, value in enums.iteritems())
+    enums['reverse_mapping'] = reverse
+    return type('Enum', (), enums)
+
 if __name__ == '__main__':
     dt = datetime.now()
     ts = datetime_to_timestamp(dt)
-    print ts, timestamp_to_datetime(1401702950)
+    print ts, timestamp_to_datetime(1433755745)
     obj = to_unicode_or_bust('가나다')
     print obj
     print type(obj)
+    num = enum('zero', 'one', 'two')
+    print num.zero
+    print num.reverse_mapping[0]
