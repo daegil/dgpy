@@ -21,6 +21,7 @@ config = {
     },
 }
 
+
 logger = logging.getLogger('app_name')
 logger.setLevel(logging.DEBUG)
 fh = logging.handlers.RotatingFileHandler(filename=config['LOG']['FILE'], maxBytes=config['LOG']['MAX_BYTES'],
